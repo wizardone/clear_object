@@ -1,8 +1,6 @@
 # ClearObject
 
-Welcome to your new gem! In this directory, you'll find the files you need to be able to package up your Ruby library into a gem. Put your Ruby code in the file `lib/clear_object`. To experiment with that code, run `bin/console` for an interactive prompt.
-
-TODO: Delete this and the text above, and describe your gem
+`clear_object` helps you define your ruby objects(classes) without the need for a lot of boilerplate code.
 
 ## Installation
 
@@ -21,8 +19,44 @@ Or install it yourself as:
     $ gem install clear_object
 
 ## Usage
+Imagine the following ruby class:
+```ruby
+class User
+  attr_reader :name, :email, :address
 
-TODO: Write usage instructions here
+  def initialize(name = 'Jo', address, email = nil, *rest)
+    @name = name
+    @address = address
+    @email = email
+  end
+
+  def location
+    address.location
+  end
+
+  Address = Struct.new(city:, street:) do
+    def location
+     "#{city} #{street}"
+    end
+  end
+end
+```
+
+clear_object gives you exactly the same code, but reduces the boilerplate
+
+```ruby
+class User
+  extends ClearObject
+  clear :name, default: 'Jo'
+  clear :email, default: nil
+  clear :address do
+    clear :city, :address
+    def location
+      "#{city} #{street}"
+    end
+  end
+end
+```
 
 ## Development
 
