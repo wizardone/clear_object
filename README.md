@@ -24,7 +24,7 @@ Imagine the following ruby class:
 class User
   attr_reader :name, :email, :address
 
-  def initialize(name = 'Jo', address, email = nil, *rest)
+  def initialize(name:'Jo', address:, email: nil)
     @name = name
     @address = address
     @email = email
