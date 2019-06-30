@@ -26,15 +26,25 @@ RSpec.describe ClearObject do
     expect(subject.clear_attributes).to eq([:name, :email])
   end
 
-  it 'stores an initializer definition' do
-    subject.clear(:name)
+  context '#initialize' do
+    it 'implicitly defines an initializer' do
+      subject.clear(:name)
 
-    expect(subject.initialize_definition).to eq('name: ')
-  end
+      expect(subject).to respond_to(:new)
+    end
 
-  it 'implicitly defines an initializer' do
-    subject.clear(:name)
+    it 'stores an initializer definition' do
+      subject.clear(:name, :email)
 
-    expect{ subject.new }.to raise_error(ArgumentError)
+      expect(subject.initialize_definition).to eq('name:, email:')
+    end
+
+    it "allows you to initialize the object" do
+      subject.clear(:name)
+
+      user = subject.new(name: 'Stefan')
+
+      expect(user.name).to eq('Stefan')
+    end
   end
 end
