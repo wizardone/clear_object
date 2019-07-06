@@ -10,11 +10,12 @@ module ClearObject
       @clear_attributes << c_attr
     end
 
-    class_eval do
-      attr_reader *@clear_attributes
-      def initialize(initialize_definition)
-      end
-    end
+    class_eval %Q{
+        attr_reader *#{clear_attributes}
+        def initialize(#{initialize_definition})
+          #{initialize_body}
+        end
+    }
   end
 
   def clear_attributes
@@ -26,6 +27,14 @@ module ClearObject
       clear_attributes.each_with_index do |c_attr, index|
         defi << "#{c_attr}:"
         defi << ', ' unless clear_attributes.size - 1 == index
+      end
+    end
+  end
+
+  def initialize_body
+    ''.tap do |init_body|
+      clear_attributes.each do |c_attr|
+        init_body << "@#{c_attr} = #{c_attr}"
       end
     end
   end
