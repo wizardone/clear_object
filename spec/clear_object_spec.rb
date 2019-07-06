@@ -23,7 +23,7 @@ RSpec.describe ClearObject do
 
   it 'fills the clear_attributes array with values' do
     subject.clear(:name, :email)
-    expect(subject.clear_attributes).to eq([:name, :email])
+    expect(subject.clear_attributes.map(&:name)).to eq([:name, :email])
   end
 
   context '#initialize' do
