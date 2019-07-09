@@ -33,18 +33,32 @@ RSpec.describe ClearObject do
       expect(subject).to respond_to(:new)
     end
 
-    it 'stores an initializer definition' do
-      subject.clear(:name, :email)
-
-      expect(subject.initialize_definition).to eq('name:, email:')
-    end
-
     it "allows you to initialize the object" do
       subject.clear(:name)
 
       user = subject.new(name: 'Stefan')
 
       expect(user.name).to eq('Stefan')
+    end
+
+    it "allows you to initialize the object with a default value string" do
+      subject.clear(:name, default: 'Tom')
+      user = subject.new
+      expect(user.name).to eq('Tom')
+    end
+
+    it "allows you to initialize the object with a default value of some object" do
+      some_class = Class
+      subject.clear(:status, default: some_class)
+      user = subject.new
+      expect(user.status).to eq(Class)
+    end
+
+    it "allows you to initialize the object with a default value of something else" do
+      some_address = []
+      subject.clear(:address, default: some_address)
+      user = subject.new
+      expect(user.address).to eq([])
     end
   end
 end
