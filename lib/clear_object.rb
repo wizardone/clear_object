@@ -6,6 +6,14 @@ require 'clear_object/attribute'
 module ClearObject
   class Error < StandardError; end
 
+  class ClearAttributeSet < Set
+    def <<(attribute)
+      if none? { |member| member.name == attribute.name}
+        add(attribute)
+      end
+    end
+  end
+
   def clear(*attributes, default: nil, &block)
     attributes.each do |c_attr|
       attr_reader c_attr
@@ -16,18 +24,18 @@ module ClearObject
   end
 
   def clear_object!
-    @clear_attributes = []
+    @clear_attributes = ClearAttributeSet.new
   end
 
   #private
   def clear_attributes
-    @clear_attributes ||= Set.new
+    @clear_attributes ||= ClearAttributeSet.new
   end
 
   def custom_initialize_def
     initialize_def = clear_attributes.map do |c_attr|
       if c_attr.default
-        "#{c_attr.name}: self.class.clear_get_default(:#{c_attr.name})"
+        "#{c_attr.name}: self.class.clear_get_default_for(:#{c_attr.name})"
       else
         "#{c_attr.name}:"
       end
@@ -46,7 +54,7 @@ module ClearObject
     }
     end
 
-    def clear_get_default(name)
+    def clear_get_default_for(name)
       value = clear_attributes.detect { |c_attr| c_attr.name == name }.default
       if value.respond_to?(:call)
         value.call

@@ -24,7 +24,7 @@ RSpec.describe ClearObject do
   end
 
   it 'holds the attributes in an accessor' do
-    expect(subject.clear_attributes).to eq([])
+    expect(subject.clear_attributes).to be_a(Set)
   end
 
   it 'has a clear method' do
@@ -44,6 +44,15 @@ RSpec.describe ClearObject do
     end
 
     it "allows you to initialize the object" do
+      subject.clear(:name)
+
+      user = subject.new(name: 'Stefan')
+
+      expect(user.name).to eq('Stefan')
+    end
+
+    it "avoids duplication" do
+      subject.clear(:name)
       subject.clear(:name)
 
       user = subject.new(name: 'Stefan')
