@@ -8,19 +8,17 @@ module ClearObject
 
   def clear(*attributes, default: nil, &block)
     attributes.each do |c_attr|
-      @clear_attributes << Attribute.new(name: c_attr, default: default)
+      attr_reader c_attr
+      clear_attributes << Attribute.new(name: c_attr, default: default)
     end
 
-    class_eval %Q{
-        attr_reader *#{clear_attributes.map { |c_attr| c_attr.name }}
-        #{custom_initialize_def}
-    }
+    class_eval(custom_initialize_def)
   end
 
   def clear_object!
     @clear_attributes = []
   end
-  
+
   #private
   def clear_attributes
     @clear_attributes ||= Set.new
@@ -29,7 +27,7 @@ module ClearObject
   def custom_initialize_def
     initialize_def = clear_attributes.map do |c_attr|
       if c_attr.default
-        "#{c_attr.name}: #{get_default(c_attr.default)}"
+        "#{c_attr.name}: self.class.clear_get_default(:#{c_attr.name})"
       else
         "#{c_attr.name}:"
       end
@@ -46,14 +44,14 @@ module ClearObject
         #{initialize_body}
       end
     }
-  end
+    end
 
-  #TODO: Try to get rid of this
-  def get_default(value)
-    if value.class == String
-      "'#{value}'"
-    else
-      value
+    def clear_get_default(name)
+      value = clear_attributes.detect { |c_attr| c_attr.name == name }.default
+      if value.respond_to?(:call)
+        value.call
+      else
+        value
+      end
     end
   end
-end

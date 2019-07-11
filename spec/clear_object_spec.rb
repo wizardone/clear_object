@@ -4,6 +4,16 @@ class User
   extend ClearObject    
 end
 
+#class MyTest
+#  custom_obj = Object.new
+#  def initi
+#    "def initialize(custom: #{custom_obj}); @custom=custom end"
+#  end
+#  attr_reader :custom
+#  class_eval("def initialize(custom: #{custom_obj}); @custom=custom end")
+#end
+
+
 RSpec.describe ClearObject do
 
   subject { User }
@@ -59,6 +69,20 @@ RSpec.describe ClearObject do
       subject.clear(:address, default: some_address)
       user = subject.new
       expect(user.address).to eq([])
+    end
+
+    it "allows you to initialize the object with a default value of something else" do
+      new_class = Class.new
+      subject.clear(:custom, default: new_class)
+      user = subject.new
+      expect(user.custom).to eq(new_class)
+    end
+
+    it "allows you to initialize the object with a default value of some callable object" do
+      callable = -> { "callable" }
+      subject.clear(:custom, default: callable)
+      user = subject.new
+      expect(user.custom).to eq("callable")
     end
   end
 end
