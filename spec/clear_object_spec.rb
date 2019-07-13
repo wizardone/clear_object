@@ -4,16 +4,6 @@ class User
   extend ClearObject    
 end
 
-#class MyTest
-#  custom_obj = Object.new
-#  def initi
-#    "def initialize(custom: #{custom_obj}); @custom=custom end"
-#  end
-#  attr_reader :custom
-#  class_eval("def initialize(custom: #{custom_obj}); @custom=custom end")
-#end
-
-
 RSpec.describe ClearObject do
 
   subject { User }
@@ -23,17 +13,15 @@ RSpec.describe ClearObject do
     expect(ClearObject::VERSION).not_to be nil
   end
 
-  it 'holds the attributes in an accessor' do
-    expect(subject.clear_attributes).to be_a(Set)
-  end
-
   it 'has a clear method' do
     expect(subject.clear).to_not be_nil
   end
 
-  it 'fills the clear_attributes array with values' do
+  it 'creates proper keyword arguments underneath' do
     subject.clear(:name, :email)
-    expect(subject.clear_attributes.map(&:name)).to eq([:name, :email])
+    expect {
+      subject.new
+    }.to raise_error(ArgumentError)
   end
 
   context '#initialize' do

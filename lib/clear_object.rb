@@ -1,18 +1,10 @@
 # frozen_string_literal: false
-
-require 'clear_object/version'
-require 'clear_object/attribute'
+require 'zeitwerk'
+loader = Zeitwerk::Loader.for_gem
+loader.setup
 
 module ClearObject
   class Error < StandardError; end
-
-  class ClearAttributeSet < Set
-    def <<(attribute)
-      if none? { |member| member.name == attribute.name}
-        add(attribute)
-      end
-    end
-  end
 
   def clear(*attributes, default: nil, &block)
     attributes.each do |c_attr|
@@ -24,12 +16,21 @@ module ClearObject
   end
 
   def clear_object!
-    @clear_attributes = ClearAttributeSet.new
+    @clear_attributes = AttributeSet.new
   end
 
-  #private
+  def clear_get_default_for(name)
+    value = clear_attributes.detect { |c_attr| c_attr.name == name }.default
+    if value.respond_to?(:call)
+      value.call
+    else
+      value
+    end
+  end
+
+  private
   def clear_attributes
-    @clear_attributes ||= ClearAttributeSet.new
+    @clear_attributes ||= AttributeSet.new
   end
 
   def custom_initialize_def
@@ -52,14 +53,5 @@ module ClearObject
         #{initialize_body}
       end
     }
-    end
-
-    def clear_get_default_for(name)
-      value = clear_attributes.detect { |c_attr| c_attr.name == name }.default
-      if value.respond_to?(:call)
-        value.call
-      else
-        value
-      end
     end
   end
