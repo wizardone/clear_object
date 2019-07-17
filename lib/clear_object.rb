@@ -6,9 +6,18 @@ loader.setup
 module ClearObject
   class Error < StandardError; end
 
-  def clear(*attributes, default: nil, &block)
+  def clear(*attributes, default: nil, **opts, &block)
     attributes.each do |c_attr|
       attr_reader c_attr
+
+      if block_given?
+        klass = Class.new do
+          extend ClearObject
+          class_eval(&block)
+        end
+        # How come this is working?
+        Object.const_set((opts[:clear_name] || c_attr).to_s.capitalize, klass)
+      end
       clear_attributes << Attribute.new(name: c_attr, default: default)
     end
 
@@ -28,7 +37,7 @@ module ClearObject
     end
   end
 
-  private
+  #private
   def clear_attributes
     @clear_attributes ||= AttributeSet.new
   end
@@ -44,7 +53,7 @@ module ClearObject
 
     initialize_body = ''.tap do |init_body|
       clear_attributes.each do |c_attr|
-        init_body << "@#{c_attr.name} = #{c_attr.name}"
+        init_body << "@#{c_attr.name} = #{c_attr.name}\n"
       end
     end
 
