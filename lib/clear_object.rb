@@ -24,10 +24,6 @@ module ClearObject
     class_eval(custom_initialize_def)
   end
 
-  def clear_object!
-    @clear_attributes = AttributeSet.new
-  end
-
   def clear_get_default_for(name)
     value = clear_attributes.detect { |c_attr| c_attr.name == name }.default
     if value.respond_to?(:call)
@@ -37,7 +33,7 @@ module ClearObject
     end
   end
 
-  #private
+  private    
   def clear_attributes
     @clear_attributes ||= AttributeSet.new
   end

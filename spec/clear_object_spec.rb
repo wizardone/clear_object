@@ -7,7 +7,7 @@ end
 RSpec.describe ClearObject do
 
   subject { User }
-  before { subject.clear_object! }
+  before { subject.instance_variable_set(:@clear_attributes, nil) }
 
   it 'has a version number' do
     expect(ClearObject::VERSION).not_to be nil
