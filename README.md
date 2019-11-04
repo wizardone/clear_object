@@ -21,10 +21,23 @@ Or install it yourself as:
 ## Usage
 Imagine the following ruby class:
 ```ruby
+class Address
+  attr_reader :city, :street
+
+  def initialize(city:, :street)
+   @city = city
+   @street = street
+  end
+
+  def location
+    "#{city}, #{street}"
+  end
+end
+
 class User
   attr_reader :name, :email, :address
 
-  def initialize(name:'Jo', address:, email: nil)
+  def initialize(name:'Jo', email: nil, address: Address.new)
     @name = name
     @address = address
     @email = email
@@ -32,12 +45,6 @@ class User
 
   def location
     address.location
-  end
-
-  Address = Struct.new(city:, street:) do
-    def location
-     "#{city} #{street}"
-    end
   end
 end
 ```
@@ -47,17 +54,19 @@ clear_object gives you exactly the same code, but reduces the boilerplate
 ```ruby
 class User
   extends ClearObject
+
   clear :name, default: 'Jo'
   clear :email, default: nil
   clear :address do
-    clear :city, :address
+    clear :city, :street
     def location
       "#{city} #{street}"
     end
   end
 end
 ```
-
+It will 'secretly' define an `Address` class for you under the hood in case you supply a block. You have control over the name of the class via the `:class_name` option.
+The `default` option will accept anything, including a callable object
 ## Development
 
 After checking out the repo, run `bin/setup` to install dependencies. Then, run `rake spec` to run the tests. You can also run `bin/console` for an interactive prompt that will allow you to experiment.
